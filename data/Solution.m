@@ -1,18 +1,37 @@
 load 'CNNparameters.mat'
 load 'cifar10testdata.mat'
 
-for d = 1:length(layertypes)
-    fprintf('layer %d is of type %s\n',d,layertypes{d});
-    filterbank = filterbanks{d};
-    if not(isempty(filterbank))
-        fprintf(' filterbank size %d x %d x %d x %d\n', ...
-        size(filterbank, 1),size(filterbank,2), ...
-        size(filterbank,3),size(filterbank,4));
-        biasvec = biasvectors{d};
-        fprintf(' number of biases is %d\n',length(biasvec));
-    end
-end
-
+% for d = 1:length(layertypes)
+%     fprintf('layer %d is of type %s\n',d,layertypes{d});
+%     filterbank = filterbanks{d};
+%     if not(isempty(filterbank))
+%         fprintf(' filterbank size %d x %d x %d x %d\n', ...
+%         size(filterbank, 1),size(filterbank,2), ...
+%         size(filterbank,3),size(filterbank,4));
+%         biasvec = biasvectors{d};
+%         fprintf(' number of biases is %d\n',length(biasvec));
+%     end
+% end
+% 
+% load debuggingTest.mat
+% 
+% figure; imagesc(imrgb); truesize(gcf,[64 64]);
+% for d = 1:length(layerResults)
+% result = layerResults{d};
+% fprintf('layer %d output is size %d x %d x %d\n',...
+% d,size(result,1), size(result,2), size(result,3));
+% end
+% %find most probable class
+% classprobvec = squeeze(layerResults{end});
+% [maxprob,maxclass] = max(classprobvec);
+% %note, classlabels is defined in 'cifar10testdat.mat'
+% fprintf('enstimated class is %s with probability %.4f\n',...
+% classlabels{maxclass},maxprob);
+% 
+% output = run_CNN(imrgb, filterbanks, biasvectors);
+% [probability, index] = max(output);
+% fprintf('enstimated class is %s with probability %.4f\n',...
+% classlabels{index},probability);
 
 confusion_matrix = zeros(10,10);
 output = zeros(1,1,10,10000);
@@ -49,9 +68,10 @@ function outarray = apply_imnormalize (inarray)
     [n,m,d1] = size(inarray);
     outarray = zeros(n,m,d1);
     for k = 1:d1
+
         for j = 1:m
             for i = 1:n
-                outarray(i,j,k) = (inarray(i,j,k)/255.0)-0.5;
+                outarray(i,j,k) = (double(inarray(i,j,k))/255.0)-0.5;
             end
         end
     end
@@ -94,7 +114,7 @@ function outarray = apply_convolve(inarray, filterbank, biasvals)
     for i = 1:d2
         total = 0;
         for j = 1:d1
-            total = total + convn(inarray(:,:,j),filterbank(:,:,j,i),'same') ;
+            total = total + convn(inarray(:,:,j),filterbank(:,:,j,i),'same');
         end
         outarray(:,:,i) = total+ biasvals(i);
     end
