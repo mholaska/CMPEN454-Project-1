@@ -1,4 +1,6 @@
 load 'CNNparameters.mat'
+load 'cifar10testdata.mat'
+
 for d = 1:length(layertypes)
     fprintf('layer %d is of type %s\n',d,layertypes{d});
     filterbank = filterbanks{d};
